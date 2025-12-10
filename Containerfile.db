@@ -1,0 +1,10 @@
+FROM docker.io/library/mariadb:11.4.5
+
+MAINTAINER "MINJUNG<wndtmgld5551@gmail.com>"
+
+ENV MARIADB_PASSWORD ogf
+ENV MARIADB_USER ogf
+ENV MARIADB_DATABASE ogf
+ENV MARIADB_ROOT_PASSWORD ogf
+
+ADD schema.sql /docker-entrypoint-initdb.d/
