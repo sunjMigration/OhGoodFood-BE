@@ -1,60 +1,71 @@
 // build.gradle (Groovy DSL)
 plugins {
     id 'java'
-    id 'war'
 
-    // ✅ Spring Boot 3.2.0 (Jakarta EE 기반)
-    id 'org.springframework.boot' version '3.2.0'
-    id 'io.spring.dependency-management' version '1.1.4' // 최신 버전으로 업데이트
+    id 'org.springframework.boot' version '4.0.0'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'kr.co'
-version = '1.0.0-BUILD-SNAPSHOT'
-sourceCompatibility = '21'
+version = '0.0.1-SNAPSHOT'
+description = 'OhGoodFood-BE'
 
-//tasks.named('bootWar') {
-//    mainClass = 'kr.co.ohgoodfood.OhGoodfoodBeApplication'
-//}
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
 
 repositories {
     mavenCentral()
 }
 
-ext {
-    // springVersion, aspectjVersion, slf4jVersion 제거
-    junitVersion = '5.12.1'
-    mockitoVersion = '5.16.1'
-    // Log4j의 구형 버전을 제거하고, Spring Boot의 기본 로깅 (Logback)을 사용합니다.
-}
-
 dependencies {
+    // ===== Spring Boot Starters =====
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-validation' // Jakarta Validation 해결
-    implementation 'org.springframework.boot:spring-boot-starter-jdbc'       // Transaction, HikariCP 해결
-    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-    implementation("org.aspectj:aspectjrt:1.9.21") // 1.9.24 대신 최신 버전 사용
-    runtimeOnly("org.aspectj:aspectjweaver:1.9.21")
+    // ===== Database =====
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
-    // JSTL (Spring Boot 3.x 환경에서 JSTL은 사용 가능하지만, 서블릿은 Jakarta로 변경)
-    implementation("jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api:3.0.0") // JSTL API (jakarta)
-    implementation("org.glassfish.web:jakarta.servlet.jsp.jstl:3.0.1")            // JSTL 구현체
+    // ===== JWT =====
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
-    // JSP 엔진 (WAR 배포 시 필요 - Spring Boot 3.x용)
-    providedCompile("jakarta.servlet:jakarta.servlet-api:6.0.0")  // jakarta.servlet-api 대체
-    providedCompile("jakarta.servlet.jsp:jakarta.servlet.jsp-api:3.1.0") // jsp-api 대체
+    // ===== API Documentation =====
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 
-    implementation("jakarta.inject:jakarta.inject-api:2.0.1")
-//    implementation 'commons-fileupload:commons-fileupload:1.5'
-    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    // ===== Monitoring =====
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+    // ===== AWS S3 =====
     implementation 'com.amazonaws:aws-java-sdk-s3:1.12.658'
+
+    // ===== Utilities =====
     implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
 
-    compileOnly 'org.projectlombok:lombok:1.18.30'
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    // ===== Lombok =====
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:${junitVersion}")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+    // ===== DevTools =====
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+
+    // ===== Test =====
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
