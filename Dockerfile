@@ -8,8 +8,8 @@ COPY . .
 #COPY gradle gradle
 #COPY build.gradle settings.gradle
 
-# 2. 의존성 다운로드 레이어
-RUN chmod +x gradlew
+# 2. 의존성 다운로드 레이어 & CRLF 제거
+RUN sed -i 's/\r$//' gradlew && chmod +x gradlew
 RUN ./gradlew dependencies --no-daemon
 
 # 3. 소스 코드 복사 및 빌드
@@ -22,5 +22,5 @@ FROM ubuntu/jre:21-24.04_stable
 WORKDIR /app
 
 COPY --from=builder /app/build/libs/*.jar app.jar
-EXPOSE 8080
+EXPOSE 8081
 ENTRYPOINT ["java", "-jar", "app.jar"]
